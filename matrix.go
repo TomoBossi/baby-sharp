@@ -41,41 +41,41 @@ func (m matrix2) convolve(kernel matrix2) matrix2 {
 	return convolved
 }
 
-func (m matrix2) closest(row, col, pad int) float64 {
+func (m matrix2) closest(row, col, padRows, padCols int) float64 {
 	mRows := m.rows()
 	mCols := m.cols()
-	if row < pad {
-		if col < pad {
+	if row < padRows {
+		if col < padCols {
 			return m[0][0]
-		} else if col >= pad+mCols {
+		} else if col >= padCols+mCols {
 			return m[0][mCols-1]
 		} else {
-			return m[0][col-pad]
+			return m[0][col-padCols]
 		}
-	} else if row >= pad+mRows {
-		if col < pad {
+	} else if row >= padRows+mRows {
+		if col < padCols {
 			return m[mRows-1][0]
-		} else if col >= pad+mCols {
+		} else if col >= padCols+mCols {
 			return m[mRows-1][mCols-1]
 		} else {
-			return m[mRows-1][col-pad]
+			return m[mRows-1][col-padCols]
 		}
-	} else if col < pad {
-		return m[row-pad][0]
+	} else if col < padCols {
+		return m[row-padRows][0]
 	} else {
-		return m[row-pad][mCols-1]
+		return m[row-padRows][mCols-1]
 	}
 }
 
-func (m matrix2) extend(pad int) matrix2 {
+func (m matrix2) extend(padRows, padCols int) matrix2 {
 	var extended matrix2
 	mRows := m.rows()
 	mCols := m.cols()
-	for i := range mRows + 2*pad {
+	for i := range mRows + 2*padRows {
 		extended = append(extended, []float64{})
-		for j := range mCols + 2*pad {
-			if i < pad || i >= pad+mRows || j < pad || j >= pad+mCols {
-				extended[i] = append(extended[i], m.closest(i, j, pad))
+		for j := range mCols + 2*padCols {
+			if i < padRows || i >= padRows+mRows || j < padCols || j >= padCols+mCols {
+				extended[i] = append(extended[i], m.closest(i, j, padRows, padCols))
 			}
 		}
 	}
@@ -83,7 +83,8 @@ func (m matrix2) extend(pad int) matrix2 {
 }
 
 func (m matrix2) convolveExtended(kernel matrix2) matrix2 {
-	pad := kernel.rows() / 2
-	extended := m.extend(pad)
+	padRows := kernel.rows() / 2
+	padCols := kernel.cols() / 2
+	extended := m.extend(padRows, padCols)
 	return extended.convolve(kernel)
 }
