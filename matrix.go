@@ -76,6 +76,8 @@ func (m matrix2) extend(padRows, padCols int) matrix2 {
 		for j := range mCols + 2*padCols {
 			if i < padRows || i >= padRows+mRows || j < padCols || j >= padCols+mCols {
 				extended[i] = append(extended[i], m.closest(i, j, padRows, padCols))
+			} else {
+				extended[i] = append(extended[i], m[i-padRows][j-padCols])
 			}
 		}
 	}
